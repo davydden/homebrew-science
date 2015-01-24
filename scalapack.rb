@@ -40,7 +40,11 @@ class Scalapack < Formula
     mkdir "build" do
       system 'cmake', '..', *args
       system 'make all'
-      system 'make test' if build.with? 'check'
+      if build.with? 'check'
+        log_name = "make-test.log"
+        system "make test 2>&1 | tee #{log_name}"
+        ohai `grep "tests passed," "#{log_name}"`.chomp
+      end
       system 'make install'
     end
   end
