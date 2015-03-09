@@ -35,12 +35,19 @@ class Scotch < Formula
       make_args = ["CCS=#{ENV["CC"]}",
                    "CCP=#{ENV["MPICC"]}",
                    "CCD=#{ENV["MPICC"]}",
-                   "LIB=.dylib",
-                   "AR=libtool",
-                   "ARFLAGS=-dynamic -install_name #{lib}/$(notdir $@) -undefined dynamic_lookup -o ",
                    "RANLIB=echo",
                    "CFLAGS=#{cflags.join(" ")}",
                    "LDFLAGS=#{ldflags.join(" ")}"]
+
+      if OS.mac? 
+        make_args << "LIB=.dylib"
+        make_args << "AR=libtool"
+        make_args << "ARFLAGS=-dynamic -install_name #{lib}/$(notdir $@) -undefined dynamic_lookup -o "
+      else
+       make_args << "LIB=.so"
+       make_args << "ARCH=gcc"
+       make_args << "ARCHFLAGS=-shared -o"
+      end
 
       system "make", "scotch", "VERBOSE=ON", *make_args
       system "make", "ptscotch", "VERBOSE=ON", *make_args
