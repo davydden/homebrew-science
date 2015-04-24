@@ -23,7 +23,7 @@ class Dealii < Formula
   depends_on "muparser"     => :recommended
   depends_on "petsc"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
   depends_on "slepc"        => :recommended
-  depends_on "trilinos"     => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
+  depends_on "trilinos"     => [:optional] + ((build.with? "openblas") ? ["with-openblas"] : [])
 
   def install
     args = %W[
