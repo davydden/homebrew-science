@@ -62,7 +62,7 @@ class Dealii < Formula
     args << "-DTRILINOS_DIR=#{Formula["trilinos"].opt_prefix}" if build.with? "trilinos"
 
     mkdir "build" do
-      system "cmake", *args, "../"
+      system "cmake", "..", *args
       system "make"
       # run minimal test cases (8 tests)
       log_name = "make-test.log"
