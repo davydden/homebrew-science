@@ -8,20 +8,21 @@ class Dealii < Formula
   end
 
   option "with-testsuite", "Run full test suite (7000+ tests). Takes a lot of time."
-  depends_on "openblas"     => :optional
 
   depends_on "cmake"        => :build
   depends_on :mpi           => [:cc, :cxx, :f90, :recommended]
+  depends_on "openblas"     => :optional
+
+  depends_on "arpack"       => [:recommended] + ((build.with? "mpi") ? ["with-mpi"] : []) + ((build.with? "openblas") ? ["with-openblas"] : [])
   depends_on "boost"        => :recommended
   depends_on "hdf5"         => [:recommended] + ((build.with? "mpi") ? ["with-mpi"] : [])
-  depends_on "arpack"       => [:recommended] + ((build.with? "mpi") ? ["with-mpi"] : []) + ((build.with? "openblas") ? ["with-openblas"] : [])
-  depends_on "mumps"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
   depends_on "metis"        => :recommended
-  depends_on "opencascade"  => :recommended
-  depends_on "netcdf"       => [:recommended, "with-fortran", "with-cxx-compat"]
-  depends_on "p4est"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : []) if build.with? "mpi"
+  depends_on "mumps"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
   depends_on "muparser"     => :recommended
+  depends_on "netcdf"       => [:recommended, "with-fortran", "with-cxx-compat"]
+  depends_on "opencascade"  => :recommended
   depends_on "petsc"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
+  depends_on "p4est"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : []) if build.with? "mpi"
   depends_on "slepc"        => :recommended
   depends_on "trilinos"     => [:optional] + ((build.with? "openblas") ? ["with-openblas"] : [])
 
