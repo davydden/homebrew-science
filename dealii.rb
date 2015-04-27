@@ -27,6 +27,7 @@ class Dealii < Formula
   depends_on "petsc"        => [:recommended] + openblasdep
   depends_on "p4est"        => [:recommended] + openblasdep if build.with? "mpi"
   depends_on "slepc"        => :recommended
+  # TODO: We won't have bottles if we make Trilinos :recommended because the bot times out.
   depends_on "trilinos"     => [:optional] + openblasdep
 
   def install
