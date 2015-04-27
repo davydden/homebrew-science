@@ -13,18 +13,21 @@ class Dealii < Formula
   depends_on :mpi           => [:cc, :cxx, :f90, :recommended]
   depends_on "openblas"     => :optional
 
-  depends_on "arpack"       => [:recommended] + ((build.with? "mpi") ? ["with-mpi"] : []) + ((build.with? "openblas") ? ["with-openblas"] : [])
+  openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
+  mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
+
+  depends_on "arpack"       => [:recommended] + mpidep + openblasdep
   depends_on "boost"        => :recommended
-  depends_on "hdf5"         => [:recommended] + ((build.with? "mpi") ? ["with-mpi"] : [])
+  depends_on "hdf5"         => [:recommended] + mpidep
   depends_on "metis"        => :recommended
-  depends_on "mumps"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
+  depends_on "mumps"        => [:recommended] + openblasdep
   depends_on "muparser"     => :recommended
   depends_on "netcdf"       => [:recommended, "with-fortran", "with-cxx-compat"]
   depends_on "opencascade"  => :recommended
-  depends_on "petsc"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : [])
-  depends_on "p4est"        => [:recommended] + ((build.with? "openblas") ? ["with-openblas"] : []) if build.with? "mpi"
+  depends_on "petsc"        => [:recommended] + openblasdep
+  depends_on "p4est"        => [:recommended] + openblasdep if build.with? "mpi"
   depends_on "slepc"        => :recommended
-  depends_on "trilinos"     => [:optional] + ((build.with? "openblas") ? ["with-openblas"] : [])
+  depends_on "trilinos"     => [:optional] + openblasdep
 
   def install
     args = %W[
