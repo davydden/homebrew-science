@@ -123,6 +123,8 @@ class Trilinos < Formula
     args << "-DIntrepid_ENABLE_TESTS=OFF"
     args << "-DSacado_ENABLE_TESTS=OFF"
     args << "-DEpetraExt_ENABLE_TESTS=OFF" if build.with? "hypre"
+    args << "-DTrilinos_ENABLE_FEI=OFF" if not OS.mac?
+    args << "-DTrilinos_ENABLE_Sundance=OFF" if not OS.mac?
 
     # Third-party libraries
     args << onoff("-DTPL_ENABLE_Boost:BOOL=",       (build.with? "boost"))
@@ -179,8 +181,9 @@ class Trilinos < Formula
     if build.with? "parmetis"
       # Ensure CMake picks up METIS 5 and not METIS 4.
       ext = OS.mac? ? "dylib" : "so"
+      ext_parmetis = OS.mac? ? "a" : "so"
       args << "-DTPL_ENABLE_ParMETIS:BOOL=ON"
-      args << "-DTPL_ParMETIS_LIBRARIES=#{Formula["parmetis"].opt_lib}/libparmetis.a;#{Formula["metis"].opt_lib}/libmetis.#{ext}"
+      args << "-DTPL_ParMETIS_LIBRARIES=#{Formula["parmetis"].opt_lib}/libparmetis.#{ext_parmetis};#{Formula["metis"].opt_lib}/libmetis.#{ext}"
       args << "-DParMETIS_INCLUDE_DIRS=#{Formula["parmetis"].opt_include}"
     else
       args << "-DTPL_ENABLE_ParMETIS:BOOL=OFF"
@@ -221,6 +224,13 @@ class Trilinos < Formula
       system "make", "install"
     end
   end
+
+  def caveats; <<-EOS
+    On Linuxbrew install with:
+      --with-openblas --without-scotch
+    EOS
+  end
+
 
   test do
     system "#{bin}/Epetra_BasicPerfTest_test.exe", "16", "12", "1", "1", "25", "-v"
