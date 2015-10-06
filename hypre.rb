@@ -14,7 +14,7 @@ class Hypre < Formula
 
   depends_on :fortran => :recommended
   depends_on :mpi => [:cc, :cxx, :f90, :f77, :optional]
-  depends_on "openblas" => :optional
+  depends_on :blas
 
   option "without-check", "Skip build-time tests (not recommended)"
   option "with-superlu", "Use internal SuperLU routines"
@@ -40,27 +40,31 @@ class Hypre < Formula
       # 1. Check for openblas
       # 2. Fall back to Accelerate
       # 3. Fall back to internal BLAS/LAPACK routines
-      if build.with? "openblas"
-        config_args += ["--with-blas=yes",
-                        "--with-blas-libs=openblas",
-                        "--with-blas-lib-dirs=#{Formula["openblas"].opt_lib}",
-                        "--with-lapack=yes",
-                        "--with-lapack-libs=openblas",
-                        "--with-lapack-lib-dirs=#{Formula["openblas"].opt_lib}"]
-      elsif build.with? "accelerate"
+      #if build.with? "openblas"
+      #  config_args += ["--with-blas=yes",
+      #                  "--with-blas-libs=openblas",
+      #                  "--with-blas-lib-dirs=#{Formula["openblas"].opt_lib}",
+      #                  "--with-lapack=yes",
+      #                  "--with-lapack-libs=openblas",
+      #                  "--with-lapack-lib-dirs=#{Formula["openblas"].opt_lib}"]
+      #elsif build.with? "accelerate"
         # Libraries used for linking to Accelerate framework; `otool -L`
         # shows that these libraries link to the same dylibs that the
         # Accelerate framework libraries do. Using the
         # "-framework Accelerate" flag would be preferable, but setting
         # CFLAGS, etc. overrides the flags in the Makefile and results
         # in errors.
-        config_args += ["--with-blas=yes",
-                        "--with-blas-libs=blas cblas",
-                        "--with-blas-lib-dirs=/usr/lib",
-                        "--with-lapack=yes",
-                        "--with-lapack-libs=lapack clapack f77lapack",
-                        "--with-lapack-lib-dirs=/usr/lib"]
-      end
+      #  config_args += ["--with-blas=yes",
+      #                  "--with-blas-libs=blas cblas",
+      #                  "--with-blas-lib-dirs=/usr/lib",
+      #                  "--with-lapack=yes",
+      #                  "--with-lapack-libs=lapack clapack f77lapack",
+      #                  "--with-lapack-lib-dirs=/usr/lib"]
+      #end
+      config_args += ["--with-blas-libs=mkl_core mkl_intel_lp64 mkl_sequential",
+                      "--with-blas-lib-dirs=${MKLROOT}/lib/intel64",
+                      "--with-lapack-libs=mkl_core mkl_intel_lp64 mkl_sequential",
+                      "--with-lapack-lib-dirs=${MKLROOT}/lib/intel64"]
 
       config_args << "--disable-fortran" if build.without? :fortran
       config_args << "--without-superlu" if build.without? "superlu"
