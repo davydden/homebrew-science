@@ -22,46 +22,46 @@ class Trilinos < Formula
   depends_on :fortran       => :recommended
   depends_on :x11           => :recommended
 
-  depends_on :python        => :recommended
-  depends_on "homebrew/python/numpy"  if build.with? "python"
-  depends_on "swig"         => :build if build.with? "python"
+  #depends_on :python        => :recommended
+  #depends_on "homebrew/python/numpy"  if build.with? "python"
+  #depends_on "swig"         => :build if build.with? "python"
 
   depends_on "cmake"        => :build
   depends_on "pkg-config"   => :build
 
-  depends_on "openblas" => :optional
+  depends_on :blas #"openblas" => :optional
 
   openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
   mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
 
-  depends_on "adol-c"       => :recommended
-  depends_on "boost"        => :recommended
-  depends_on "cppunit"      => :recommended
-  depends_on "doxygen"      => ["with-graphviz", :recommended]
-  depends_on "hwloc"        => :recommended
-  depends_on "libmatio"     => [:recommended] + ((build.with? "hdf5") ? ["with-hdf5"] : [])
-  depends_on "metis"        => :recommended
-  depends_on "mumps"        => [:recommended] + openblasdep
-  depends_on "netcdf"       => ["with-fortran", :recommended]
-  depends_on "parmetis"     => :recommended if build.with? "mpi"
-  depends_on "scalapack"    => [:recommended] + openblasdep
-  depends_on "scotch"       => :recommended
-  depends_on "suite-sparse" => [:recommended] + openblasdep
+  #depends_on "adol-c"       => :recommended
+  #depends_on "boost"        => :recommended
+  #depends_on "cppunit"      => :recommended
+  #depends_on "doxygen"      => ["with-graphviz", :recommended]
+  #depends_on "hwloc"        => :recommended
+  #depends_on "libmatio"     => [:recommended] + ((build.with? "hdf5") ? ["with-hdf5"] : [])
+  #depends_on "metis"        => :recommended
+  #depends_on "mumps"        => [:recommended] + openblasdep
+  #depends_on "netcdf"       => ["with-fortran", :recommended]
+  #depends_on "parmetis"     => :recommended if build.with? "mpi"
+  #depends_on "scalapack"    => [:recommended] + openblasdep
+  #depends_on "scotch"       => :recommended
+  #depends_on "suite-sparse" => [:recommended] + openblasdep
   #-depends_on "superlu"      => [:recommended] + openblasdep // Amesos2_Superlu_FunctionMap.hpp:83:14: error: no type named 'superlu_options_t' in namespace 'SLU'
-  depends_on "superlu_dist" => [:recommended] + openblasdep if build.with? "parmetis"
+  #depends_on "superlu_dist" => [:recommended] + openblasdep if build.with? "parmetis"
 
   #-depends_on "petsc"        => :optional # ML packages currently do not compile with PETSc >= 3.3
   #-depends_on "qd"           => :optional # Fails due to global namespace issues (std::pow vs qd::pow)
   #-depends_on "binutils"     => :optional # libiberty is deliberately omitted in Homebrew (see PR #35881)
 
   # Experimental TPLs:
-  depends_on "eigen"        => :recommended
+  #depends_on "eigen"        => :recommended
   depends_on "hypre"        => [:recommended] + mpidep + openblasdep # EpetraExt tests fail to compile
-  depends_on "glpk"         => :recommended
-  depends_on "hdf5"         => [:recommended] + mpidep
-  depends_on "tbb"          => :recommended
-  depends_on "glm"          => :recommended
-  depends_on "yaml-cpp"     => :recommended
+  #depends_on "glpk"         => :recommended
+  #depends_on "hdf5"         => [:recommended] + mpidep
+  #depends_on "tbb"          => :recommended
+  #depends_on "glm"          => :recommended
+  #depends_on "yaml-cpp"     => :recommended
 
   #-depends_on "lemon"        => :optional # lemon is currently built as executable only, no libraries
   #-depends_on "cask"         => :optional # cask  is currently built as executable only, no libraries
@@ -113,17 +113,21 @@ class Trilinos < Formula
     args << "-DMPI_BASE_DIR:PATH=#{HOMEBREW_PREFIX}" if build.with? "mpi"
 
     # BLAS / LAPACK support
-    if build.with? "openblas"
-      args << "-DBLAS_LIBRARY_NAMES=openblas"
-      args << "-DBLAS_LIBRARY_DIRS=#{Formula["openblas"].opt_lib}"
-      args << "-DLAPACK_LIBRARY_NAMES=openblas"
-      args << "-DLAPACK_LIBRARY_DIRS=#{Formula["openblas"].opt_lib}"
-    end
+    #if build.with? "openblas"
+    #  args << "-DBLAS_LIBRARY_NAMES=openblas"
+    #  args << "-DBLAS_LIBRARY_DIRS=#{Formula["openblas"].opt_lib}"
+    #  args << "-DLAPACK_LIBRARY_NAMES=openblas"
+    #  args << "-DLAPACK_LIBRARY_DIRS=#{Formula["openblas"].opt_lib}"
+    #end
+    args << "-DBLAS_LIBRARY_NAMES=mkl_intel_lp64;mkl_gf_lp64;mkl_core;mkl_sequential;pthread;m"
+    args << "-DBLAS_LIBRARY_DIRS=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64"
+    args << "-DLAPACK_LIBRARY_NAMES=mkl_intel_lp64;mkl_gf_lp64;mkl_core;mkl_sequential;pthread;m"
+    args << "-DLAPACK_LIBRARY_DIRS=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64"
 
     args << "-DTrilinos_ASSERT_MISSING_PACKAGES=OFF" if build.head?
 
     args << onoff("-DTPL_ENABLE_MPI:BOOL=",         (build.with? "mpi"))
-    args << onoff("-DTrilinos_ENABLE_OpenMP:BOOL=", (ENV.compiler != :clang))
+    #args << onoff("-DTrilinos_ENABLE_OpenMP:BOOL=", (ENV.compiler != :clang))
     args << "-DTrilinos_ENABLE_CXX11:BOOL=ON"
 
     # Extra non-default packages
@@ -255,8 +259,10 @@ class Trilinos < Formula
       # against the libraries listed in Trilinos_LIBRARIES.
       # See https://github.com/Homebrew/homebrew-science/issues/2148#issuecomment-103614509
       # A workaround it to remove PyTrilinos from the COMPONENTS_LIST :
-      inreplace "#{lib}/cmake/Trilinos/TrilinosConfig.cmake" do |s|
-        s.gsub! "PyTrilinos;", "" if s.include? "COMPONENTS_LIST"
+      if build.with? "python"
+        inreplace "#{lib}/cmake/Trilinos/TrilinosConfig.cmake" do |s|
+          s.gsub! "PyTrilinos;", "" if s.include? "COMPONENTS_LIST"
+        end
       end
     end
   end
