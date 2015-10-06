@@ -14,15 +14,12 @@ class Slepc < Formula
 
   option "with-complex", "Use complex version by default. Otherwise, real-valued version will be symlinked"
   option "without-check", "Skip run-time tests (not recommended)"
-  option "with-openblas", "Install dependencies with openblas"
 
-  openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
-
-  depends_on "petsc" => [:build] + openblasdep
+  depends_on "petsc"
   depends_on :mpi => [:cc, :f90]
   depends_on :fortran
   depends_on :x11 => :optional
-  depends_on "arpack" => [:recommended, "with-mpi"] + openblasdep
+  depends_on "arpack" => [:recommended, "with-mpi"]
 
   def install
     ENV.deparallelize
