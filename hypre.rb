@@ -36,11 +36,12 @@ class Hypre < Formula
 
       config_args << "--enable-debug" if build.with? "debug"
 
-      blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"].split(";").join(" ")
+      blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
       blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
-      config_args += ["--with-blas-libs=#{blas_names}",
+      blas_names_split = blas_names.split(";").join(" ")
+      config_args += ["--with-blas-libs=#{blas_names_split}",
                       "--with-blas-lib-dirs=#{blas_lib}",
-                      "--with-lapack-libs=#{blas_names}",
+                      "--with-lapack-libs=#{blas_names_split}",
                       "--with-lapack-lib-dirs=#{blas_lib}"]
 
       config_args << "--disable-fortran" if build.without? :fortran
@@ -97,8 +98,9 @@ class Hypre < Formula
           # Overriding makefile variables at the command line is unworkable
           # here because the LFLAGS variable must be overridden, and LFLAGS
           # contains other makefile variable substitutions.
-          lapack_flag = build.with?("openblas") ? "openblas" : "lapack"
-          inreplace "Makefile", "-lstdc++", "-lstdc++ -l#{lapack_flag}"
+          ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
+          ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
+          inreplace "Makefile", "-lstdc++", "-lstdc++ #{ldflags}"
 
           # Hack to excise Fortran examples from "make all"; they are still
           # in the "make fortran" target, thus making it easier to implement
