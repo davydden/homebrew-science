@@ -11,7 +11,7 @@ class Numdiff < Formula
 
   def install
     ENV.append "CPPFLAGS", "-I#{Formula['gettext'].include}"
-    ENV.append "LDFLAGS",  "-L#{Formula['gettext'].lib} -lintl"
+    ENV.append "LDFLAGS",  "-L#{Formula['gettext'].lib}" # -lintl"
 
     system "./configure", "--prefix=#{prefix}"
     system "make"
