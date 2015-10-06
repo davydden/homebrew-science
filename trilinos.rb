@@ -35,20 +35,20 @@ class Trilinos < Formula
   mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
 
   #depends_on "adol-c"       => :recommended
-  #depends_on "boost"        => :recommended
+  depends_on "boost"        => :recommended
   #depends_on "cppunit"      => :recommended
   #depends_on "doxygen"      => ["with-graphviz", :recommended]
   #depends_on "hwloc"        => :recommended
   #depends_on "libmatio"     => [:recommended] + ((build.with? "hdf5") ? ["with-hdf5"] : [])
-  #depends_on "metis"        => :recommended
+  depends_on "metis"        => :recommended
   #depends_on "mumps"        => [:recommended] + openblasdep
   #depends_on "netcdf"       => ["with-fortran", :recommended]
-  #depends_on "parmetis"     => :recommended if build.with? "mpi"
+  depends_on "parmetis"     => :recommended if build.with? "mpi"
   #depends_on "scalapack"    => [:recommended] + openblasdep
   #depends_on "scotch"       => :recommended
   #depends_on "suite-sparse" => [:recommended] + openblasdep
   #-depends_on "superlu"      => [:recommended] + openblasdep // Amesos2_Superlu_FunctionMap.hpp:83:14: error: no type named 'superlu_options_t' in namespace 'SLU'
-  #depends_on "superlu_dist" => [:recommended] + openblasdep if build.with? "parmetis"
+  depends_on "superlu_dist" => [:recommended] + openblasdep if build.with? "parmetis"
 
   #-depends_on "petsc"        => :optional # ML packages currently do not compile with PETSc >= 3.3
   #-depends_on "qd"           => :optional # Fails due to global namespace issues (std::pow vs qd::pow)
