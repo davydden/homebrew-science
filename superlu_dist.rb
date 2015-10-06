@@ -16,7 +16,7 @@ class SuperluDist < Formula
   depends_on :mpi => [:cc, :f77]
 
   depends_on "parmetis"
-  depends_on :blas # "openblas" => :optional
+  depends_on :blas
 
   # fix duplicate symbols [mc64dd_,mc64ed_,mc64fd_] when linking with superlu
   patch do
@@ -28,13 +28,16 @@ class SuperluDist < Formula
     # prevent linking errors on linuxbrew:
     ENV.deparallelize
     rm "#{buildpath}/make.inc"
-    blaslib = ENV["HOMEBREW_BLAS_LDFLAGS"]
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
+    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
     (buildpath / "make.inc").write <<-EOS.undent
       PLAT         = _mac_x
       DSuperLUroot = #{buildpath}
       DSUPERLULIB  = $(DSuperLUroot)/lib/libsuperlu_dist.a
       BLASDEF      = -DUSE_VENDOR_BLAS
-      BLASLIB      = #{blaslib}
+      BLASLIB      = #{ldflags}
       METISLIB     = -L#{Formula["metis"].opt_lib} -lmetis
       PARMETISLIB  = -L#{Formula["parmetis"].opt_lib} -lparmetis
       FLIBS        =
