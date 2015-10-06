@@ -23,20 +23,19 @@ class Petsc < Formula
   depends_on :x11 => :optional
   depends_on "cmake" => :build
 
-  depends_on :blas #"openblas" => :optional
-  openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
+  depends_on :blas
 
-  depends_on "superlu"      => [:recommended] + openblasdep
-  depends_on "superlu_dist" => [:recommended] + openblasdep
+  depends_on "superlu"      => [:recommended]
+  depends_on "superlu_dist" => [:recommended]
   depends_on "metis"        => :recommended
   depends_on "parmetis"     => :recommended
-  depends_on "scalapack"    => [:recommended] + openblasdep
-  depends_on "mumps"        => [:recommended] + openblasdep # mumps is built with mpi by default
-  depends_on "hypre"        => ["with-mpi", :recommended] + openblasdep
-  depends_on "sundials"     => ["with-mpi", :recommended] + openblasdep
+  depends_on "scalapack"    => [:recommended]
+  depends_on "mumps"        => [:recommended] # mumps is built with mpi by default
+  depends_on "hypre"        => ["with-mpi", :recommended]
+  depends_on "sundials"     => ["with-mpi", :recommended]
   depends_on "hdf5"         => ["with-mpi", :recommended]
   depends_on "hwloc"        => :recommended
-  depends_on "suite-sparse" => [:recommended] + openblasdep
+  depends_on "suite-sparse" => [:recommended]
   depends_on "netcdf"       => ["with-fortran", :recommended]
   depends_on "fftw"         => ["with-mpi", "with-fortran", :recommended]
 
@@ -90,14 +89,11 @@ class Petsc < Formula
     args << "--with-mumps-dir=#{oprefix("mumps")}" if build.with? "mumps"
     args << "--with-x=0" if build.without? "x11"
 
-    # if build with openblas, need to provide lapack as well.
-    #if build.with? "openblas"
-    #  exten = (OS.mac?) ? "dylib" : "so"
-    #  args << ("--with-blas-lib=#{Formula["openblas"].opt_lib}/libopenblas.#{exten}")
-    #  args << ("--with-lapack-lib=#{Formula["openblas"].opt_lib}/libopenblas.#{exten}")
-    #end
-    #args << "--with-blas-lapack-lib=mkl_core mkl_intel_lp64 mkl_sequential"
-    args << "--with-blas-lapack-dir=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64"
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    exten = (OS.mac?) ? "dylib" : "so"
+    blas_processed = blas_names.split(";").map { |word| "#{blas_lib}/lib#{word}.#{exten}" }.join(" ")
+    args << "--with-blas-lapack-lib=#{blas_processed}"
 
     # configure fails if those vars are set differently.
     ENV["PETSC_DIR"] = Dir.getwd
@@ -109,6 +105,8 @@ class Petsc < Formula
     args_real << "--with-hypre-dir=#{oprefix("hypre")}" if build.with? "hypre"
     args_real << "--with-sundials-dir=#{oprefix("sundials")}" if build.with? "sundials"
     args_real << "--with-hwloc-dir=#{oprefix("hwloc")}" if build.with? "hwloc"
+
+    
     system "./configure", *(args + args_real)
     system "make", "all"
     if build.with? "check"
