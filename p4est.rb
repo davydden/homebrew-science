@@ -19,7 +19,7 @@ class P4est < Formula
 
   depends_on :mpi => [:cc, :cxx, :f77, :f90]
   depends_on :fortran
-  depends_on :blas #"openblas" => :optional
+  depends_on :blas
 
   def install
     ENV["CC"]       = ENV["MPICC"]
@@ -29,12 +29,15 @@ class P4est < Formula
     ENV["CFLAGS"]   = "-O2"
     ENV["CPPFLAGS"] = "-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL"
 
-    blas = ENV["HOMEBREW_BLAS_LDFLAGS"]
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
+    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
 
     system "./configure", "--enable-mpi",
                           "--enable-shared",
                           "--disable-vtk-binary",
-                          "BLAS_LIBS=#{blas}",
+                          "BLAS_LIBS=#{ldflags}",
                           "--prefix=#{prefix}"
 
     system "make"
