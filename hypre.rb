@@ -36,35 +36,12 @@ class Hypre < Formula
 
       config_args << "--enable-debug" if build.with? "debug"
 
-      # BLAS/LAPACK linking priority:
-      # 1. Check for openblas
-      # 2. Fall back to Accelerate
-      # 3. Fall back to internal BLAS/LAPACK routines
-      #if build.with? "openblas"
-      #  config_args += ["--with-blas=yes",
-      #                  "--with-blas-libs=openblas",
-      #                  "--with-blas-lib-dirs=#{Formula["openblas"].opt_lib}",
-      #                  "--with-lapack=yes",
-      #                  "--with-lapack-libs=openblas",
-      #                  "--with-lapack-lib-dirs=#{Formula["openblas"].opt_lib}"]
-      #elsif build.with? "accelerate"
-        # Libraries used for linking to Accelerate framework; `otool -L`
-        # shows that these libraries link to the same dylibs that the
-        # Accelerate framework libraries do. Using the
-        # "-framework Accelerate" flag would be preferable, but setting
-        # CFLAGS, etc. overrides the flags in the Makefile and results
-        # in errors.
-      #  config_args += ["--with-blas=yes",
-      #                  "--with-blas-libs=blas cblas",
-      #                  "--with-blas-lib-dirs=/usr/lib",
-      #                  "--with-lapack=yes",
-      #                  "--with-lapack-libs=lapack clapack f77lapack",
-      #                  "--with-lapack-lib-dirs=/usr/lib"]
-      #end
-      config_args += ["--with-blas-libs=mkl_core mkl_intel_lp64 mkl_sequential",
-                      "--with-blas-lib-dirs=${MKLROOT}/lib/intel64",
-                      "--with-lapack-libs=mkl_core mkl_intel_lp64 mkl_sequential",
-                      "--with-lapack-lib-dirs=${MKLROOT}/lib/intel64"]
+      blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"].split(";").join(" ")
+      blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+      config_args += ["--with-blas-libs=#{blas_names}",
+                      "--with-blas-lib-dirs=#{blas_lib}",
+                      "--with-lapack-libs=#{blas_names}",
+                      "--with-lapack-lib-dirs=#{blas_lib}"]
 
       config_args << "--disable-fortran" if build.without? :fortran
       config_args << "--without-superlu" if build.without? "superlu"
