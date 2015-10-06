@@ -34,19 +34,19 @@ class Trilinos < Formula
   openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
   mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
 
-  #depends_on "adol-c"       => :recommended
+  depends_on "adol-c"       => :recommended
   depends_on "boost"        => :recommended
-  #depends_on "cppunit"      => :recommended
-  #depends_on "doxygen"      => ["with-graphviz", :recommended]
-  #depends_on "hwloc"        => :recommended
-  #depends_on "libmatio"     => [:recommended] + ((build.with? "hdf5") ? ["with-hdf5"] : [])
+  depends_on "cppunit"      => :recommended
+  depends_on "doxygen"      => ["with-graphviz", :recommended]
+  depends_on "hwloc"        => :recommended
+  depends_on "libmatio"     => [:recommended] + ((build.with? "hdf5") ? ["with-hdf5"] : [])
   depends_on "metis"        => :recommended
-  #depends_on "mumps"        => [:recommended] + openblasdep
-  #depends_on "netcdf"       => ["with-fortran", :recommended]
+  depends_on "mumps"        => [:recommended] + openblasdep
+  depends_on "netcdf"       => ["with-fortran", :recommended]
   depends_on "parmetis"     => :recommended if build.with? "mpi"
-  #depends_on "scalapack"    => [:recommended] + openblasdep
-  #depends_on "scotch"       => :recommended
-  #depends_on "suite-sparse" => [:recommended] + openblasdep
+  depends_on "scalapack"    => [:recommended] + openblasdep
+  depends_on "scotch"       => :recommended
+  depends_on "suite-sparse" => [:recommended] + openblasdep
   #-depends_on "superlu"      => [:recommended] + openblasdep // Amesos2_Superlu_FunctionMap.hpp:83:14: error: no type named 'superlu_options_t' in namespace 'SLU'
   depends_on "superlu_dist" => [:recommended] + openblasdep if build.with? "parmetis"
 
@@ -55,13 +55,13 @@ class Trilinos < Formula
   #-depends_on "binutils"     => :optional # libiberty is deliberately omitted in Homebrew (see PR #35881)
 
   # Experimental TPLs:
-  #depends_on "eigen"        => :recommended
+  depends_on "eigen"        => :recommended
   depends_on "hypre"        => [:recommended] + mpidep + openblasdep # EpetraExt tests fail to compile
-  #depends_on "glpk"         => :recommended
-  #depends_on "hdf5"         => [:recommended] + mpidep
-  #depends_on "tbb"          => :recommended
-  #depends_on "glm"          => :recommended
-  #depends_on "yaml-cpp"     => :recommended
+  depends_on "glpk"         => :recommended
+  depends_on "hdf5"         => [:recommended] + mpidep
+  depends_on "tbb"          => :recommended
+  depends_on "glm"          => :recommended
+  depends_on "yaml-cpp"     => :recommended
 
   #-depends_on "lemon"        => :optional # lemon is currently built as executable only, no libraries
   #-depends_on "cask"         => :optional # cask  is currently built as executable only, no libraries
