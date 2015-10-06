@@ -16,7 +16,7 @@ class SuperluDist < Formula
   depends_on :mpi => [:cc, :f77]
 
   depends_on "parmetis"
-  depends_on "openblas" => :optional
+  depends_on :blas # "openblas" => :optional
 
   # fix duplicate symbols [mc64dd_,mc64ed_,mc64fd_] when linking with superlu
   patch do
@@ -28,7 +28,7 @@ class SuperluDist < Formula
     # prevent linking errors on linuxbrew:
     ENV.deparallelize
     rm "#{buildpath}/make.inc"
-    blaslib = ((build.with? "openblas") ? "-L#{Formula["openblas"].opt_lib} -lopenblas" : "-framework Accelerate")
+    blaslib = ENV["HOMEBREW_BLAS_LDFLAGS"]
     (buildpath / "make.inc").write <<-EOS.undent
       PLAT         = _mac_x
       DSuperLUroot = #{buildpath}
@@ -43,8 +43,8 @@ class SuperluDist < Formula
       ARCHFLAGS    = cr
       RANLIB       = true
       CC           = #{ENV["MPICC"]}
-      CFLAGS       = -fPIC -O2 -I#{Formula["parmetis"].opt_include} -I#{Formula["metis"].opt_include}
-      NOOPTS       = -fPIC
+      CFLAGS       = -fPIC -std=c99 -O2 -I#{Formula["parmetis"].opt_include} -I#{Formula["metis"].opt_include}
+      NOOPTS       = -fPIC -std=c99
       FORTRAN      = #{ENV["MPIF77"]}
       F90FLAGS     = -O2
       LOADER       = #{ENV["MPIF77"]}
