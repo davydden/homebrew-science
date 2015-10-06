@@ -23,7 +23,7 @@ class Petsc < Formula
   depends_on :x11 => :optional
   depends_on "cmake" => :build
 
-  depends_on "openblas" => :optional
+  depends_on :blas #"openblas" => :optional
   openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
 
   depends_on "superlu"      => [:recommended] + openblasdep
@@ -91,11 +91,13 @@ class Petsc < Formula
     args << "--with-x=0" if build.without? "x11"
 
     # if build with openblas, need to provide lapack as well.
-    if build.with? "openblas"
-      exten = (OS.mac?) ? "dylib" : "so"
-      args << ("--with-blas-lib=#{Formula["openblas"].opt_lib}/libopenblas.#{exten}")
-      args << ("--with-lapack-lib=#{Formula["openblas"].opt_lib}/libopenblas.#{exten}")
-    end
+    #if build.with? "openblas"
+    #  exten = (OS.mac?) ? "dylib" : "so"
+    #  args << ("--with-blas-lib=#{Formula["openblas"].opt_lib}/libopenblas.#{exten}")
+    #  args << ("--with-lapack-lib=#{Formula["openblas"].opt_lib}/libopenblas.#{exten}")
+    #end
+    #args << "--with-blas-lapack-lib=mkl_core mkl_intel_lp64 mkl_sequential"
+    args << "--with-blas-lapack-dir=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64"
 
     # configure fails if those vars are set differently.
     ENV["PETSC_DIR"] = Dir.getwd
@@ -118,18 +120,18 @@ class Petsc < Formula
     system "make", "install"
 
     # complex-valued case:
-    ENV["PETSC_ARCH"] = arch_complex
-    args_cmplx = ["--prefix=#{prefix}/#{arch_complex}",
-                  "--with-scalar-type=complex"]
-    system "./configure", *(args + args_cmplx)
-    system "make", "all"
-    if build.with? "check"
-      log_name = "make-check-" + arch_complex + ".log"
-      system "make test 2>&1 | tee #{log_name}"
-      ohai `grep "Completed test examples" "#{log_name}"`.chomp
-      prefix.install "#{log_name}"
-    end
-    system "make", "install"
+    #ENV["PETSC_ARCH"] = arch_complex
+    #args_cmplx = ["--prefix=#{prefix}/#{arch_complex}",
+    #              "--with-scalar-type=complex"]
+    #system "./configure", *(args + args_cmplx)
+    #system "make", "all"
+    #if build.with? "check"
+    #  log_name = "make-check-" + arch_complex + ".log"
+    #  system "make test 2>&1 | tee #{log_name}"
+    #  ohai `grep "Completed test examples" "#{log_name}"`.chomp
+    #  prefix.install "#{log_name}"
+    #end
+    #system "make", "install"
 
     # Link only what we want.
     petsc_arch = ((build.with? "complex") ? arch_complex : arch_real)
