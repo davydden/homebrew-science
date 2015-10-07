@@ -31,13 +31,6 @@ class Scalapack < Formula
     ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
     ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
 
-    #if build.with? "openblas"
-    #  blas = "-L#{Formula["openblas"].opt_lib} -lopenblas"
-    #  lapack = blas
-    #else
-    #  blas = (OS.mac?) ? "-L#{Formula["veclibfort"].opt_lib} -lveclibfort" : "-lblas"
-    #  lapack = (OS.mac?) ? blas : "-llapack"
-    #end
     args += ["-DBLAS_LIBRARIES=#{ldflags}", "-DLAPACK_LIBRARIES=#{ldflags}"]
 
     mkdir "build" do
