@@ -15,15 +15,15 @@ class Mumps < Formula
 
   depends_on :mpi => [:cc, :cxx, :f90, :recommended]
   if build.with? "mpi"
-    depends_on "scalapack" => (build.with? "openblas") ? ["with-openblas"] : []
+    depends_on "scalapack"
   end
   depends_on "metis"    => :optional if build.without? "mpi"
   depends_on "parmetis" => :optional if build.with? "mpi"
   depends_on "scotch5"  => :optional
   depends_on "scotch"   => :optional
-  depends_on "openblas" => :optional
 
   depends_on :fortran
+  depends_on :blas
 
   resource "mumps_simple" do
     url "https://github.com/dpo/mumps_simple/archive/v0.4.tar.gz"
@@ -104,11 +104,11 @@ class Mumps < Formula
                     "FL=#{ENV["FC"]} -fPIC"]
     end
 
-    if build.with? "openblas"
-      make_args << "LIBBLAS=-L#{Formula["openblas"].opt_lib} -lopenblas"
-    else
-      make_args << "LIBBLAS=-lblas -llapack"
-    end
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
+    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
+    make_args << "LIBBLAS=#{ldflags}"
 
     ENV.deparallelize # Build fails in parallel on Mavericks.
 
@@ -153,8 +153,8 @@ class Mumps < Formula
           simple_args += ["scotch_libdir=#{Formula["scotch"].opt_lib}",
                           "scotch_libs=-L$(scotch_libdir) -lptscotch -lptscotcherr -lscotch"]
         end
-        simple_args += ["blas_libdir=#{Formula["openblas"].opt_lib}",
-                        "blas_libs=-L$(blas_libdir) -lopenblas"] if build.with? "openblas"
+        simple_args += ["blas_libdir=#{blas_lib}",
+                        "blas_libs=#{ldflags}"]
         system "make", "SHELL=/bin/bash", *simple_args
         lib.install ("libmumps_simple." + ((OS.mac?) ? "dylib" : "so"))
         include.install "mumps_simple.h"
