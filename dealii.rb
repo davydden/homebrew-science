@@ -23,20 +23,20 @@ class Dealii < Formula
   openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
   mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
 
-  #depends_on "arpack"       => [:recommended] + mpidep + openblasdep
+  depends_on "arpack"       => [:recommended] + mpidep + openblasdep
   depends_on "boost"        => :recommended
   #-depends_on "doxygen"      => :optional # installation error: CMake Error at doc/doxygen/cmake_install.cmake:31 (file)
-  #depends_on "hdf5"         => [:recommended] + mpidep
+  depends_on "hdf5"         => [:recommended] + mpidep
   depends_on "metis"        => :recommended
-  #depends_on "muparser"     => :recommended if MacOS.version != :mountain_lion # Undefined symbols for architecture x86_64
-  #depends_on "netcdf"       => [:recommended, "with-fortran", "with-cxx-compat"]
-  #depends_on "opencascade"  => :recommended
+  depends_on "muparser"     => :recommended if MacOS.version != :mountain_lion # Undefined symbols for architecture x86_64
+  depends_on "netcdf"       => [:recommended, "with-fortran", "with-cxx-compat"]
+  depends_on "opencascade"  => :recommended
   depends_on "p4est"        => [:recommended] + openblasdep if build.with? "mpi"
   depends_on "parmetis"     => :recommended if build.with? "mpi"
   depends_on "petsc"        => [:recommended] + openblasdep
   depends_on "slepc"        => :recommended
-  #depends_on "suite-sparse" => [:recommended] + openblasdep
-  #depends_on "tbb"          => :recommended
+  depends_on "suite-sparse" => [:recommended] + openblasdep
+  depends_on "tbb"          => :recommended
   depends_on "trilinos"     => [:recommended] + openblasdep
 
   needs :cxx11
