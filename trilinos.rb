@@ -29,7 +29,7 @@ class Trilinos < Formula
   depends_on "cmake"        => :build
   depends_on "pkg-config"   => :build
 
-  depends_on :blas #"openblas" => :optional
+  depends_on :blas
 
   openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
   mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
@@ -112,22 +112,17 @@ class Trilinos < Formula
     # implementations may be used.
     args << "-DMPI_BASE_DIR:PATH=#{HOMEBREW_PREFIX}" if build.with? "mpi"
 
-    # BLAS / LAPACK support
-    #if build.with? "openblas"
-    #  args << "-DBLAS_LIBRARY_NAMES=openblas"
-    #  args << "-DBLAS_LIBRARY_DIRS=#{Formula["openblas"].opt_lib}"
-    #  args << "-DLAPACK_LIBRARY_NAMES=openblas"
-    #  args << "-DLAPACK_LIBRARY_DIRS=#{Formula["openblas"].opt_lib}"
-    #end
-    args << "-DBLAS_LIBRARY_NAMES=mkl_intel_lp64;mkl_gf_lp64;mkl_core;mkl_sequential;pthread;m"
-    args << "-DBLAS_LIBRARY_DIRS=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64"
-    args << "-DLAPACK_LIBRARY_NAMES=mkl_intel_lp64;mkl_gf_lp64;mkl_core;mkl_sequential;pthread;m"
-    args << "-DLAPACK_LIBRARY_DIRS=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64"
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    args << "-DBLAS_LIBRARY_NAMES=#{blas_names}"
+    args << "-DBLAS_LIBRARY_DIRS=#{blas_lib}"
+    args << "-DLAPACK_LIBRARY_NAMES=#{blas_names}"
+    args << "-DLAPACK_LIBRARY_DIRS=#{blas_lib}"
 
     args << "-DTrilinos_ASSERT_MISSING_PACKAGES=OFF" if build.head?
 
     args << onoff("-DTPL_ENABLE_MPI:BOOL=",         (build.with? "mpi"))
-    #args << onoff("-DTrilinos_ENABLE_OpenMP:BOOL=", (ENV.compiler != :clang))
+    args << "-DTrilinos_ENABLE_OpenMP:BOOL=OFF"
     args << "-DTrilinos_ENABLE_CXX11:BOOL=ON"
 
     # Extra non-default packages
