@@ -18,22 +18,27 @@ class Scalapack < Formula
 
   depends_on :mpi => [:cc, :f90]
   depends_on "cmake" => :build
-  depends_on "openblas" => :optional
-  depends_on "veclibfort" if build.without?("openblas") && OS.mac?
+  depends_on :blas
+  # depends_on "veclibfort" if build.without?("openblas") && OS.mac? ## TODO: add inside :blas
   depends_on :fortran
 
   def install
     args = std_cmake_args
     args << "-DBUILD_SHARED_LIBS=ON"
 
-    if build.with? "openblas"
-      blas = "-L#{Formula["openblas"].opt_lib} -lopenblas"
-      lapack = blas
-    else
-      blas = (OS.mac?) ? "-L#{Formula["veclibfort"].opt_lib} -lveclibfort" : "-lblas"
-      lapack = (OS.mac?) ? blas : "-llapack"
-    end
-    args += ["-DBLAS_LIBRARIES=#{blas}", "-DLAPACK_LIBRARIES=#{lapack}"]
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
+    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
+
+    #if build.with? "openblas"
+    #  blas = "-L#{Formula["openblas"].opt_lib} -lopenblas"
+    #  lapack = blas
+    #else
+    #  blas = (OS.mac?) ? "-L#{Formula["veclibfort"].opt_lib} -lveclibfort" : "-lblas"
+    #  lapack = (OS.mac?) ? blas : "-llapack"
+    #end
+    args += ["-DBLAS_LIBRARIES=#{ldflags}", "-DLAPACK_LIBRARIES=#{ldflags}"]
 
     mkdir "build" do
       system "cmake", "..", *args
