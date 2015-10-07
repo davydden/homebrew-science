@@ -18,12 +18,11 @@ class Dealii < Formula
 
   depends_on "cmake"        => :build
   depends_on :mpi           => [:cc, :cxx, :f90, :recommended]
-  depends_on :blas #"openblas"     => :optional
+  depends_on :blas
 
-  openblasdep = (build.with? "openblas") ? ["with-openblas"] : []
   mpidep      = (build.with? "mpi")      ? ["with-mpi"]      : []
 
-  depends_on "arpack"       => [:recommended] + mpidep + openblasdep
+  depends_on "arpack"       => [:recommended] + mpidep
   depends_on "boost"        => :recommended
   #-depends_on "doxygen"      => :optional # installation error: CMake Error at doc/doxygen/cmake_install.cmake:31 (file)
   depends_on "hdf5"         => [:recommended] + mpidep
@@ -31,13 +30,13 @@ class Dealii < Formula
   depends_on "muparser"     => :recommended if MacOS.version != :mountain_lion # Undefined symbols for architecture x86_64
   depends_on "netcdf"       => [:recommended, "with-fortran", "with-cxx-compat"]
   depends_on "opencascade"  => :recommended
-  depends_on "p4est"        => [:recommended] + openblasdep if build.with? "mpi"
+  depends_on "p4est"        => :recommended if build.with? "mpi"
   depends_on "parmetis"     => :recommended if build.with? "mpi"
-  depends_on "petsc"        => [:recommended] + openblasdep
+  depends_on "petsc"        => :recommended
   depends_on "slepc"        => :recommended
-  depends_on "suite-sparse" => [:recommended] + openblasdep
+  depends_on "suite-sparse" => :recommended
   depends_on "tbb"          => :recommended
-  depends_on "trilinos"     => [:recommended] + openblasdep
+  depends_on "trilinos"     => :recommended
 
   needs :cxx11
   def install
@@ -56,22 +55,14 @@ class Dealii < Formula
 
     args << "-DDEAL_II_COMPONENT_DOCUMENTATION=ON" if build.with? "doxygen"
 
-    #if build.with? "openblas"
     ext = OS.mac? ? "dyld" : "so"
-    #  args << "-DLAPACK_FOUND=true"
-    #  args << "-DLAPACK_INCLUDE_DIRS=#{Formula["openblas"].opt_include}"
-    #  args << "-DLAPACK_LIBRARIES=#{Formula["openblas"].opt_lib}/libopenblas.#{ext}"
-    #  args << "-DLAPACK_LINKER_FLAGS=-lgfortran -lm"
-    #end
+    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
+    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
+    blas_inc   = ENV["HOMEBREW_BLASLAPACK_INC"]
+    blas_processed = blas_names.split(";").map { |word| "#{blas_lib}/lib#{word}.#{ext}" }.join(";")
     args << "-DLAPACK_FOUND=true"
-    args << "-DLAPACK_INCLUDE_DIRS=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/include"
-    #args << "-DLAPACK_LINKER_FLAGS=-lgfortran -lm"
-    args << "-DLAPACK_LIBRARIES=/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64/libmkl_core.#{ext};/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64/libmkl_intel_lp64.#{ext};/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64/libmkl_sequential.#{ext}" #;/apps/intel/ComposerXE2013/composer_xe_2013.5.192/mkl/lib/intel64/libmkl_gf_lp64.#{ext}"
-    
-    #-DLAPACK_LIBRARIES="/path/to/mkl/libmkl_gf_lp64.so;/path/to/mkl/libmkl_sequential.so;/path/to/mkl/libmkl_core.so" 
-
-    #args << "-DLAPACK_LINKER_FLAGS=#{ENV["HOMEBREW_BLAS_LDFLAGS"]}"
-     #-DWITH_LAPACK=ON #-DLAPACK_LIBRARIES="/home/tamiko/temp/test/petsc-3.3-p5/linux-gnu-cxx-opt/lib/libflapack.a;/home/tamiko/temp/test/petsc-3.3-p5/linux-gnu-cxx-opt/lib/libfblas.a;/usr/lib64/gcc/x86_64-pc-linux-gnu/4.6.3/libgfortran.a;/usr/lib64/gcc/x86_64-pc-linux-gnu/4.6.3/libquadmath.a;/usr/lib64/libm.a"
+    args << "-DLAPACK_INCLUDE_DIRS=#{blas_inc}"
+    args << "-DLAPACK_LIBRARIES=#{blas_processed}"
 
     if build.with? "mpi"
       args << "-DCMAKE_C_COMPILER=mpicc"
