@@ -29,10 +29,7 @@ class P4est < Formula
     ENV["CFLAGS"]   = "-O2"
     ENV["CPPFLAGS"] = "-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL"
 
-    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
-    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
-    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
-    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
+    ldflags    = BlasRequirement.ldflags(ENV["HOMEBREW_BLASLAPACK_LIB"],ENV["HOMEBREW_BLASLAPACK_NAMES"])
 
     system "./configure", "--enable-mpi",
                           "--enable-shared",
