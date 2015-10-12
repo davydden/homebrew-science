@@ -25,12 +25,7 @@ class Scalapack < Formula
   def install
     args = std_cmake_args
     args << "-DBUILD_SHARED_LIBS=ON"
-
-    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
-    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
-    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
-    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
-
+    ldflags = BlasRequirement.ldflags(ENV["HOMEBREW_BLASLAPACK_LIB"],ENV["HOMEBREW_BLASLAPACK_NAMES"])
     args += ["-DBLAS_LIBRARIES=#{ldflags}", "-DLAPACK_LIBRARIES=#{ldflags}"]
 
     mkdir "build" do
