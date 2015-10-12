@@ -89,10 +89,7 @@ class Petsc < Formula
     args << "--with-mumps-dir=#{oprefix("mumps")}" if build.with? "mumps"
     args << "--with-x=0" if build.without? "x11"
 
-    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
-    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
-    exten = (OS.mac?) ? "dylib" : "so"
-    blas_processed = blas_names.split(";").map { |word| "#{blas_lib}/lib#{word}.#{exten}" }.join(" ")
+    blas_processed = BlasRequirement.full_path(ENV["HOMEBREW_BLASLAPACK_LIB"],ENV["HOMEBREW_BLASLAPACK_NAMES"]," ")
     args << "--with-blas-lapack-lib=#{blas_processed}"
 
     # configure fails if those vars are set differently.
