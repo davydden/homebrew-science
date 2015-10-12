@@ -104,10 +104,7 @@ class Mumps < Formula
                     "FL=#{ENV["FC"]} -fPIC"]
     end
 
-    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
-    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
-    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
-    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
+    ldflags    = BlasRequirement.ldflags(ENV["HOMEBREW_BLASLAPACK_LIB"],ENV["HOMEBREW_BLASLAPACK_NAMES"])
     make_args << "LIBBLAS=#{ldflags}"
 
     ENV.deparallelize # Build fails in parallel on Mavericks.
@@ -153,6 +150,7 @@ class Mumps < Formula
           simple_args += ["scotch_libdir=#{Formula["scotch"].opt_lib}",
                           "scotch_libs=-L$(scotch_libdir) -lptscotch -lptscotcherr -lscotch"]
         end
+        blas_lib = ENV["HOMEBREW_BLASLAPACK_LIB"]
         simple_args += ["blas_libdir=#{blas_lib}",
                         "blas_libs=#{ldflags}"]
         system "make", "SHELL=/bin/bash", *simple_args
