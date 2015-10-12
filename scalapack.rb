@@ -19,7 +19,6 @@ class Scalapack < Formula
   depends_on :mpi => [:cc, :f90]
   depends_on "cmake" => :build
   depends_on :blas
-  # depends_on "veclibfort" if build.without?("openblas") && OS.mac? ## TODO: add inside :blas
   depends_on :fortran
 
   def install
