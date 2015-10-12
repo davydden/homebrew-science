@@ -55,11 +55,8 @@ class Dealii < Formula
 
     args << "-DDEAL_II_COMPONENT_DOCUMENTATION=ON" if build.with? "doxygen"
 
-    ext = OS.mac? ? "dyld" : "so"
-    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
-    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
     blas_inc   = ENV["HOMEBREW_BLASLAPACK_INC"]
-    blas_processed = blas_names.split(";").map { |word| "#{blas_lib}/lib#{word}.#{ext}" }.join(";")
+    blas_processed = BlasRequirement.full_path(ENV["HOMEBREW_BLASLAPACK_LIB"],ENV["HOMEBREW_BLASLAPACK_NAMES"],";")
     args << "-DLAPACK_FOUND=true"
     args << "-DLAPACK_INCLUDE_DIRS=#{blas_inc}"
     args << "-DLAPACK_LIBRARIES=#{blas_processed}"
