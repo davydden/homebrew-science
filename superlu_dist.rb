@@ -28,10 +28,7 @@ class SuperluDist < Formula
     # prevent linking errors on linuxbrew:
     ENV.deparallelize
     rm "#{buildpath}/make.inc"
-    blas_names = ENV["HOMEBREW_BLASLAPACK_NAMES"]
-    blas_lib   = ENV["HOMEBREW_BLASLAPACK_LIB"]
-    ldflags    = blas_lib != "" ? "-L#{blas_lib} " : ""
-    ldflags   += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
+    ldflags    = BlasRequirement.ldflags(ENV["HOMEBREW_BLASLAPACK_LIB"],ENV["HOMEBREW_BLASLAPACK_NAMES"])
     (buildpath / "make.inc").write <<-EOS.undent
       PLAT         = _mac_x
       DSuperLUroot = #{buildpath}
