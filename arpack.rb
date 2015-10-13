@@ -16,8 +16,7 @@ class Arpack < Formula
 
   depends_on :fortran
   depends_on :mpi => [:optional, :f77]
-  depends_on "openblas" => :optional
-  depends_on "veclibfort" if build.without?("openblas") && OS.mac?
+  depends_on :blas
 
   def install
     ENV.m64 if MacOS.prefer_64_bit?
@@ -25,13 +24,8 @@ class Arpack < Formula
     cc_args = (build.with? :mpi) ? ["F77=#{ENV["MPIF77"]}"] : []
     args = cc_args + ["--disable-dependency-tracking", "--prefix=#{libexec}"]
     args << "--enable-mpi" if build.with? :mpi
-    if build.with? "openblas"
-      args << "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas"
-    elsif OS.mac?
-      args << "--with-blas=-L#{Formula["veclibfort"].opt_lib} -lvecLibFort"
-    else
-      args << "--with-blas=-lblas -llapack"
-    end
+    ldflags = BlasRequirement.ldflags(ENV["HOMEBREW_BLASLAPACK_LIB"], ENV["HOMEBREW_BLASLAPACK_NAMES"])
+    args << "--with-blas=#{ldflags}"
 
     # HEAD version does not contain generated configure scirpt
     # must bootstrap first:
