@@ -1,4 +1,4 @@
-require_relative "blas_requirement"
+require_relative "requirements/blas_requirement"
 
 class BlastestSingle2 < Formula
   desc "blas test for veclibfort (single Fortran BLAS)"
@@ -8,7 +8,7 @@ class BlastestSingle2 < Formula
   sha256 "9fad00d1d7e8d5d0be3c16fd25755c5d089205fae9dd4716481f8072a6a7f954"
 
   depends_on :fortran
-  depends_on BlasRequirement => :fortran
+  depends_on BlasRequirement => :fortran_single
 
   def install
     ldflags    = BlasRequirement.ldflags(ENV["HOMEBREW_BLASLAPACK_LIB"], ENV["HOMEBREW_BLASLAPACK_NAMES"])
