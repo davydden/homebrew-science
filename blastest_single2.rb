@@ -1,7 +1,7 @@
 require_relative "requirements/blas_requirement"
 
 class BlastestSingle2 < Formula
-  desc "blas test for veclibfort (single Fortran BLAS)"
+  desc "blas test for veclibfort (single Fortran)"
   homepage "https://github.com/davydden"
   url "https://gist.githubusercontent.com/davydden/1f9ebf3692beca2438f8/raw/0ba39c8775db3bb21c09c3440bf78ff5f778277d/blas.f90"
   version "1.0"
