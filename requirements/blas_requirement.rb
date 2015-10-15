@@ -112,7 +112,7 @@ class BlasRequirement < Requirement
     if !success
       opoo "BLAS not configured"
       puts <<-EOS.undent
-        Falling back to brewed openblas. If you prefer to use a system BLAS, please set
+        Falling back to brewed #{self.class.default_formula}. If you prefer to use a system BLAS, please set
           HOMEBREW_BLASLAPACK_NAMES (e.g. "mkl_intel_lp64;mkl_sequential;mkl_core")
           HOMEBREW_BLASLAPACK_LIB   (e.g. "${MKLROOT}/lib/intel64")
           HOMEBREW_BLASLAPACK_INC   (e.g. "${MKLROOT}/include")
