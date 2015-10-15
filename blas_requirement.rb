@@ -13,7 +13,7 @@ class BlasRequirement < Requirement
   def initialize(tags = [])
     # if we are on OSX and need fortran and veclibfort is installed
     # by default try it. Otherwise do standard "blas;lapack"
-    if tags.include?(:fortran) && OS.mac? && Formula["veclibfort"].installed?
+    if tags.include?(:fortran_single) && OS.mac? && Formula["veclibfort"].installed?
       @default_names = "veclibfort"
       @default_lib   = "#{Formula["veclibfort"].opt_lib}"
       @default_inc   = "#{Formula["veclibfort"].opt_include}"
@@ -80,7 +80,7 @@ class BlasRequirement < Requirement
       success = system "#{ENV["CC"]} #{cflags} #{tmpdir}/blastest.c -o #{tmpdir}/blastest #{ldflags}",
                 :err => "/dev/null"
       # test fortran to invoke libveclibfort on OS-X
-      if @tags.include?(:fortran)
+      if @tags.include?(:fortran_single)
         (tmpdir/"blastest.f90").write <<-EOS.undent
           program test
           implicit none
