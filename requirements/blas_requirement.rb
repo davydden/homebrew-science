@@ -16,12 +16,12 @@ class BlasRequirement < Requirement
       @default_names = "openblas"
       @default_lib   = "#{Formula["openblas"].opt_lib}"
       @default_inc   = "#{Formula["openblas"].opt_include}"
-    # if we are on OSX and need fortran and veclibfort is installed
-    # by default try it. Otherwise do standard "blas;lapack"
+    # if we are on OSX and need fortran and veclibfort is installed use it
     elsif tags.include?(:fortran_single) && OS.mac? && Formula["veclibfort"].installed?
       @default_names = "veclibfort"
       @default_lib   = "#{Formula["veclibfort"].opt_lib}"
       @default_inc   = "#{Formula["veclibfort"].opt_include}"
+    # Otherwise do standard "blas;lapack"
     else
       @default_names = "blas;lapack"
       @default_lib   = ""
@@ -45,16 +45,19 @@ class BlasRequirement < Requirement
     end
   end
 
+  # A static function to create linking flags
   def self.ldflags(blas_lib,blas_names)
     res  = blas_lib != "" ? "-L#{blas_lib} " : ""
     res += blas_names.split(";").map { |word| "-l#{word}" }.join(" ")
     return res
   end
 
+  # A static function to create compiler flags
   def self.cflags(blas_inc)
     return blas_inc != "" ? "-I#{blas_inc}"  : ""
   end
 
+  # A static function to create full path to blas-lapack libraries separated by @p separator .
   def self.full_path(blas_lib,blas_names,separator)
     exten = (OS.mac?) ? "dylib" : "so"
     tmp = blas_lib.chomp("/")
