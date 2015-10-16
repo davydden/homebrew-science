@@ -11,9 +11,14 @@ class BlasRequirement < Requirement
   default_formula "openblas"   unless OS.mac?
 
   def initialize(tags = [])
+    # if openblas is installed, use it on OS-X/Linux
+    if Formula["openblas"].installed?
+      @default_names = "openblas"
+      @default_lib   = "#{Formula["openblas"].opt_lib}"
+      @default_inc   = "#{Formula["openblas"].opt_include}"
     # if we are on OSX and need fortran and veclibfort is installed
     # by default try it. Otherwise do standard "blas;lapack"
-    if tags.include?(:fortran_single) && OS.mac? && Formula["veclibfort"].installed?
+    elsif tags.include?(:fortran_single) && OS.mac? && Formula["veclibfort"].installed?
       @default_names = "veclibfort"
       @default_lib   = "#{Formula["veclibfort"].opt_lib}"
       @default_inc   = "#{Formula["veclibfort"].opt_include}"
