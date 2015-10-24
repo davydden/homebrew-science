@@ -58,7 +58,7 @@ class Trilinos < Formula
 
   # Experimental TPLs:
   depends_on "eigen"        => :recommended
-  depends_on "hypre"        => [:recommended] + mpidep + openblasdep # EpetraExt tests fail to compile
+  depends_on "hypre"        => [:recommended] + ((build.with? "mpi") ? [] : ["without-mpi"]) + openblasdep # EpetraExt tests fail to compile
   depends_on "glpk"         => :recommended
   depends_on "hdf5"         => [:recommended] + mpidep
   depends_on "tbb"          => :recommended
@@ -212,7 +212,7 @@ class Trilinos < Formula
     if build.with? "mumps"
       args << "-DTPL_ENABLE_MUMPS:BOOL=ON"
       args << "-DMUMPS_LIBRARY_DIRS=#{Formula["mumps"].opt_lib}"
-      args << "-DMUMPS_LIBRARY_NAMES=dmumps;pord;mumps_common"
+      args << "-DMUMPS_LIBRARY_NAMES=dmumps;mumps_common;pord"
     end
 
     args << onoff("-DTPL_ENABLE_PETSC:BOOL=", false) #       (build.with? "petsc"))
