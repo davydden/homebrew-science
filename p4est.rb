@@ -3,7 +3,7 @@ class P4est < Formula
   homepage "http://www.p4est.org"
   url "http://p4est.github.io/release/p4est-1.1.tar.gz"
   sha256 "0b5327a35f0c869bf920b8cab5f20caa4eb55692eaaf1f451d5de30285b25139"
-  revision 1
+  revision 2
 
   bottle do
     cellar :any
@@ -28,7 +28,6 @@ class P4est < Formula
     ENV["CXX"]      = ENV["MPICXX"]
     ENV["F77"]      = ENV["MPIF77"]
     ENV["FC"]       = ENV["MPIFC"]
-    ENV["CFLAGS"]   = "-O2"
     ENV["CPPFLAGS"] = "-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL"
 
     if build.with? "openblas"
@@ -39,12 +38,26 @@ class P4est < Formula
       blas = "BLAS_LIBS=-lblas -llapack"
     end
 
-    system "./configure", "--enable-mpi",
-                          "--enable-shared",
-                          "--disable-vtk-binary",
-                          "#{blas}",
-                          "--prefix=#{prefix}"
+    args = ["--enable-mpi",
+            "--enable-shared",
+            "--disable-vtk-binary",
+            "#{blas}"
+           ]
 
+    # fast / release version:
+    args_fast = ["--prefix=#{prefix}/FAST"]
+    ENV["CFLAGS"] = "-O2"
+    system "./configure", *(args + args_fast)
+    system "make"
+    system "make", "check" if build.with? "check"
+    system "make", "install"
+
+    # slow / debug
+    args_debug = ["--prefix=#{prefix}/DEBUG",
+                  "--enable-debug"
+                 ]
+    ENV["CFLAGS"] = "-O0 -g"
+    system "./configure", *(args + args_debug)
     system "make"
     system "make", "check" if build.with? "check"
     system "make", "install"
